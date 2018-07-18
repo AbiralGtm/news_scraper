@@ -8,20 +8,17 @@ from scrapy import Request
 
 
 
-class ImagekhabarPoliticsSpider(scrapy.Spider):
-
-    name = 'imagekhabar_politics'
+class ImagekhabarHealthSpider(scrapy.Spider):
+    name = 'imagekhabar_health'
     allowed_domains = ['imagekhabar.com']
-    start_urls = ['http://imagekhabar.com/category/5/politics']
-
-
+    start_urls = ['http://imagekhabar.com/category/28/health']
 
     def parse(self, response):
         cred = credentials.Certificate('nepali-epapers-firebase-adminsdk-x93g2-6820548d04.json')
         firebase_admin.initialize_app(cred)
         self.db = firestore.client()
         news_item_list = response.xpath('//*[@class="row"]/div[@class="col-xl-12 col-lg-6 col-md-6 col-sm-12 mt-30"]')
-        category = "politics"
+        category = "health"
         site_name="imagekhabar.com"
         author="anonymous"
         num_reads=0
@@ -34,12 +31,8 @@ class ImagekhabarPoliticsSpider(scrapy.Spider):
                                       'author':author,
                                       'num_reads':num_reads}
             url = response.urljoin(news_url)
-
             final_content = Request(url, callback=self.get_items_details)
             yield final_content
-
-
-
 
     def get_items_details(self,response):
         title = response.xpath('//*[@class="col-lg-8 col-md-12 mb-30"]/*[@class="news-details-layout1"]/*[@class="position-relative mb-30"]/h1[@class="title-semibold-dark size-c30"]/text()').extract_first()
