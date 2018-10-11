@@ -14,9 +14,9 @@ class MyImagesPipeline(ImagesPipeline):
         assert "id" in item.keys()
         conn = sqlite3.connect(SQLITE_DB_NAME)
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM epapers WHERE news= (?) ", (item["id"],))
+        cursor.execute("SELECT * FROM epapers WHERE id= (?) ", (item["id"],))
         if cursor.fetchone():
-            for image_url in item['image_urls']:
+            for image_url in item['thumb']:
                 yield scrapy.Request(image_url)
             cursor.execute('INSERT INTO epapers VALUES (?)', (item['id'],))
             conn.commit()

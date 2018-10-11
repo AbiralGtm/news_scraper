@@ -32,41 +32,42 @@ class HimalkhabarSpider(scrapy.Spider):
             'epaper_id':epaper_id
         }
 
-        yield scrapy.Request(url = url , callback  = self.data, meta = {'contents': contents} )
-    def data(self,response):
-        data = []
+        yield scrapy.Request(url = url , callback  = self.epapers_details,dont_filter=True, meta = {'contents': contents} )
+    def epapers_details(self,response):
+
         contents = response.meta['contents'];
-        images = response.xpath('//div[@class="my-gallery"]/figure/img/@src').extract()
+        images = response.xpath('//div[@class="my-gallery"]/figure/a/@href').extract()
+        thumb = response.xpath('//div[@class="my-gallery"]/figure/a/@href').extract()
         cover_img = images[0]
         num_pages = len(images)
         date_extract = response.xpath('//p/i/text()').extract_first()
-        date_parse = parse(date_extract)
-        date = datetime.datetime.strptime(date_parse, '%Y-%m-%d')
+        # date_parse = parse(date_extract)
+        # date = datetime.datetime.strptime(date_extract, '%Y-%m-%d')
+        date="2075-4554-454"
 
-        date_other = datetime.datetime(date_other_get)
         id_segment = response.url.rpartition('/')
         id = id_segment[2]
         epaper_id = contents['epaper_id']
 
-        data['id'] = id
-        data['cover_img'] = cover_img
-        data['thumb'] =images
-        data['images']=images
-        data['num_pages']= num_pages
-        data['name']= contents['name']
-        data['name_np']= contents['name_np']
-        data['date']= date
-        data['publication']= contents['publication']
-        data['publication_other']= contents['publication_other']
-        data['type'] = contents['type']
-        data['num_reads'] = 0
-        data['created_date'] = firestore.SERVER_TIMESTAMP
-
+        epapers_details = {
+            'id':id,
+            'cover_img':cover_img,
+            'thumb':thumb,
+            'images':images,
+            'num_pages':num_pages,
+            'name': contents['name'],
+            'name_np':contents['name_np'],
+            'date':date,
+            'publication':contents['publication'],
+            'publication_other':contents['publication_other'],
+            'type':contents['type'],
+            'num_reads':0,
+            'created_date':firestore.SERVER_TIMESTAMP
+        }
         epaper_home = {
             'id':epaper_id,
             'cover_img':cover_img,
             'latest_date':date,
-            'latest_date_other': date_other,
             'modified_date':firestore.SERVER_TIMESTAMP,
             'name':contents['name'],
             'publication':contents['publication'],
@@ -74,11 +75,10 @@ class HimalkhabarSpider(scrapy.Spider):
             'thumb_url':cover_img,
             'title':contents['name'],
             'title_other':contents['name_np'],
-            'type':type
+            'type':contents['type']
         }
         doc_ref_epaper_home = self.db.collection(u'epapers_home').document(epaper_id).set(epaper_home)
-        doc_ref = self.db.collection(u'epapers').document(epaper_id +'_'+ date_parse).set(data)
-        yield data
-        return data
+        doc_ref = self.db.collection(u'epapers').document(epaper_id +'_'+ date).set(epapers_details)
+        yield epapers_details
         return epaper_home
 

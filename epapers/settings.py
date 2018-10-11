@@ -65,12 +65,11 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 SQLITE_DB_NAME = "epapers.db"
-IMAGES_STORE = "gs://nepali-epapers.appspot.com/"
+IMAGES_STORE = "gs://nepali-epapers.appspot.com/images/"
 GCS_PROJECT_ID = "nepali-epapers"
-IMAGE_PREFIX_URL = "https://firebasestorage.googleapis.com/v0/b/nepali-epapers.appspot.com/images/"
+IMAGE_PREFIX_URL = "https://storage.googleapis.com/nepali-epapers.appspot.com/images/"
 IMAGES_THUMBS = {
     'small': (50, 50),
-    'big': (50, 50)
 }
 ITEM_PIPELINES = {
     'epapers.pipelines.EpapersPipeline.EpapersPipeline': 300,
